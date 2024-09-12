@@ -1,33 +1,30 @@
-name: Deploy Flask Application
+name: Deploy Telegram Bot
 
 on:
   push:
     branches:
-      - Deploy  # Запускать workflow при пуше в ветку Deploy
+      - Deploy
+    paths:
+      - 'newsletter-service/tg-bot/**'  # Следит за изменениями в директории tg-bot
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted  # Используем self-hosted runner
-
+    runs-on: self-hosted
     steps:
-      # Шаг 1: Клонируем код репозитория
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Шаг 2: Сборка Docker-образа из Dockerfile в поддиректории
       - name: Build Docker image
-        run: docker build -t flask-app:latest -f ./newsletter-service/tg-bot/Dockerfile ./newsletter-service/tg-bot
+        run: docker build -t telegram-bot:latest -f ./newsletter-service/tg-bot/Dockerfile ./newsletter-service/tg-bot
 
-      # Шаг 3: Остановка и удаление предыдущего контейнера (если существует)
       - name: Stop and remove existing container
         run: |
-          docker stop flask-app || true
-          docker rm flask-app || true
+          docker stop telegram-bot || true
+          docker rm telegram-bot || true
 
-      # Шаг 4: Запуск нового контейнера
       - name: Run Docker container
         run: |
           docker run -d \
-            --name flask-app \
+            --name telegram-bot \
             -p 5000:5000 \
-            flask-app:latest
+            telegram-bot:latest
