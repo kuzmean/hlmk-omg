@@ -4,6 +4,12 @@ on:
   push:
     branches:
       - Deploy
+    paths:
+      - '/'            # Следит за изменениями в корневой директории
+      - 'Dockerfile'    # Следит за изменениями Dockerfile в корне
+      - 'package.json'  # Следит за изменениями package.json в корне
+      - 'package-lock.json'
+      - '**.js'         # Следит за изменениями любых файлов с расширением .js в корневой папке
 
 jobs:
   build-and-deploy:
