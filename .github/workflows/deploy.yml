@@ -3,29 +3,28 @@ name: Deploy Application
 on:
   push:
     branches:
-      - Deploy
-    paths:
-      - '/'            # Следит за изменениями в корневой директории
-      - 'Dockerfile'    # Следит за изменениями Dockerfile в корне
-      - 'package.json'  # Следит за изменениями package.json в корне
-      - 'package-lock.json'
-      - '**.js'         # Следит за изменениями любых файлов с расширением .js в корневой папке
+      - Deploy  # Запускать при пуше в ветку Deploy
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted  # Используем ваш self-hosted runner
+    runs-on: self-hosted  # Используем self-hosted runner
+
     steps:
+      # Шаг 1: Клонируем код репозитория
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      # Шаг 2: Сборка Docker-образа
       - name: Build Docker image
         run: docker build -t my-node-app:latest .
 
+      # Шаг 3: Остановка и удаление предыдущего контейнера (если существует)
       - name: Stop and remove existing container
         run: |
           docker stop my-node-app || true
           docker rm my-node-app || true
 
+      # Шаг 4: Запуск нового контейнера
       - name: Run Docker container
         run: |
           docker run -d \
