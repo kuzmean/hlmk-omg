@@ -3,7 +3,7 @@ name: Deploy Flask Application
 on:
   push:
     branches:
-      - Deploy
+      - Deploy  # Запускать workflow при пуше в ветку Deploy
 
 jobs:
   build-and-deploy:
@@ -14,9 +14,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Шаг 2: Сборка Docker-образа из Dockerfile
+      # Шаг 2: Сборка Docker-образа из Dockerfile в поддиректории
       - name: Build Docker image
-        run: docker build -t flask-app:latest .
+        run: docker build -t flask-app:latest -f ./newsletter-service/tg-bot/Dockerfile ./newsletter-service/tg-bot
 
       # Шаг 3: Остановка и удаление предыдущего контейнера (если существует)
       - name: Stop and remove existing container
