@@ -15,8 +15,7 @@ bot = telebot.TeleBot(TELEGRAM_TOKEN)
 app = Flask(__name__)
 CORS(app)
 
-
-socketio = SocketIO(app, cors_allowed_origins="http://84.201.144.84:3000/")
+socketio = SocketIO(app, cors_allowed_origins="http://localhost:3000")
 
 def save_image(image_data):
     image_data = image_data.split(",")[1]
@@ -42,7 +41,7 @@ def send_message():
 
     try:
         formatted_message = (
-            f"__Запрос на генерацию:__ {initial_request}\n"
+            f"__Запрос на генерацию:__ {initialRequest}\n"
             f"__Комментарий пользователя:__ {message}"
         )
 
@@ -64,12 +63,9 @@ def send_message():
                 parse_mode='Markdown'
             )
 
-       
         return jsonify({'success': True, 'message': 'Сообщение отправлено!', 'message_id': sent_message.message_id}), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
-
-
 
 @bot.callback_query_handler(func=lambda call: call.data in ["like", "dislike"])
 def handle_rating_callback(call):
@@ -80,7 +76,6 @@ def handle_rating_callback(call):
     bot.send_message(user_id, result_message)
 
     try:
-        
         socketio.emit('rating_update', {
             'message_id': message_id,
             'rating': rating,
@@ -88,14 +83,12 @@ def handle_rating_callback(call):
     except Exception as e:
         print(f"Ошибка при отправке оценки через WebSocket: {e}")
 
-
 @app.route('/update-rating', methods=['POST'])
 def update_rating():
     data = request.json
     message_id = data.get('message_id')
     rating = data.get('rating')
 
-   
     socketio.emit('rating_update', {
         'message_id': message_id,
         'rating': rating
@@ -107,8 +100,9 @@ def start_bot():
     bot.polling()
 
 if __name__ == '__main__':
-  
     bot_thread = threading.Thread(target=start_bot)
     bot_thread.start()
     
-    socketio.run(app, host='0.0.0.0', port=5000)
+    # Быстрое исправление
+    socketio.run(app, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
+
