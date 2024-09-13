@@ -105,4 +105,3 @@ if __name__ == '__main__':
     
     # Быстрое исправление
     socketio.run(app, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
-
