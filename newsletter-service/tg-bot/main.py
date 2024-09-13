@@ -8,15 +8,19 @@ from flask_cors import CORS
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from flask_socketio import SocketIO, emit
 
-TELEGRAM_TOKEN = '7304368665:AAHaDslyPe06nmsvihiK9AKbrRWIv6FAEDA'
-USER_ID = '301979941'
+# Телеграм токен и пользовательский ID
+TELEGRAM_TOKEN = 'your_telegram_token'
+USER_ID = 'your_user_id'
 
+# Создаем бота и Flask приложение
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 app = Flask(__name__)
 CORS(app)
 
-socketio = SocketIO(app, cors_allowed_origins="http://localhost:3000")
+# Настраиваем SocketIO с CORS
+socketio = SocketIO(app, cors_allowed_origins="*")
 
+# Функция для сохранения изображения
 def save_image(image_data):
     image_data = image_data.split(",")[1]
     image_bytes = base64.b64decode(image_data)
@@ -25,6 +29,7 @@ def save_image(image_data):
     image.save(image_path)
     return image_path
 
+# Функция для создания кнопок согласования
 def create_rating_buttons():
     keyboard = InlineKeyboardMarkup()
     like_button = InlineKeyboardButton("Согласовать", callback_data="like")
@@ -32,6 +37,7 @@ def create_rating_buttons():
     keyboard.add(like_button, dislike_button)
     return keyboard
 
+# Маршрут для отправки сообщения
 @app.route('/send-message', methods=['POST'])
 def send_message():
     data = request.json
@@ -41,7 +47,7 @@ def send_message():
 
     try:
         formatted_message = (
-            f"__Запрос на генерацию:__ {initialRequest}\n"
+            f"__Запрос на генерацию:__ {initial_request}\n"
             f"__Комментарий пользователя:__ {message}"
         )
 
@@ -67,12 +73,13 @@ def send_message():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
+# Обработчик обратного вызова для кнопок согласования
 @bot.callback_query_handler(func=lambda call: call.data in ["like", "dislike"])
 def handle_rating_callback(call):
     user_id = call.from_user.id
     rating = call.data
     message_id = call.message.message_id 
-    result_message = "Данные переданны оператору." if rating == "like" else "Данные переданны оператору."
+    result_message = "Данные переданы оператору." if rating == "like" else "Данные переданы оператору."
     bot.send_message(user_id, result_message)
 
     try:
@@ -83,6 +90,7 @@ def handle_rating_callback(call):
     except Exception as e:
         print(f"Ошибка при отправке оценки через WebSocket: {e}")
 
+# Маршрут для обновления рейтинга
 @app.route('/update-rating', methods=['POST'])
 def update_rating():
     data = request.json
@@ -96,6 +104,7 @@ def update_rating():
 
     return jsonify({'success': True, 'message': 'Рейтинг обновлен'}), 200
 
+# Функция для запуска бота в отдельном потоке
 def start_bot():
     bot.polling()
 
@@ -103,5 +112,5 @@ if __name__ == '__main__':
     bot_thread = threading.Thread(target=start_bot)
     bot_thread.start()
     
-    # Быстрое исправление
-    socketio.run(app, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
+    # Запуск Flask-приложения с SocketIO
+    socketio.run(app, host='0.0.0.0', port=5000)
