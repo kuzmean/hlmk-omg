@@ -3,20 +3,18 @@ name: Deploy Application
 on:
   push:
     branches:
-      - Deploy  # Запускать при пуше в ветку Deploy
+      - Deploy
     paths:
-      - 'package.json'  
-      - 'package-lock.json'  
-      - 'src/**'  
-      - 'public/**'  
-      - 'Dockerfile'  
-      - 'logo.svg'  
-      - 'test.png'
-      - '.github/workflows/**'  # Следит за изменениями в директории workflows
-      
+      - 'package.json'
+      - 'package-lock.json'
+      - 'src/**'
+      - 'public/**'
+      - 'Dockerfile'
+      - '.github/workflows/deploy.yml'
+
 jobs:
   build-and-deploy:
-    runs-on: self-hosted 
+    runs-on: self-hosted
 
     steps:
       - name: Checkout Code
@@ -35,7 +33,7 @@ jobs:
       - name: Run Docker container
         run: |
           docker run -d \
-            --network my-network \  # Подключаем к той же сети
+            --network my-network \
             --name my-node-app \
             -p 3000:3000 \
             my-node-app:latest
