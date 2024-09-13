@@ -6,7 +6,7 @@ on:
       - Deploy
     paths:
       - 'newsletter-service/tg-bot/**'  # Следит за изменениями в директории tg-bot
-      - '.github/workflows/**'  # Следит за изменениями в директории workflows
+      - '.github/workflows/build.yml'  # Следит за изменениями в директории workflows
 
 jobs:
   build-and-deploy:
@@ -15,22 +15,26 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Create Docker network  # Создаем общую сеть для контейнеров
+      - name: Create Docker network
+        # Создаем общую сеть для контейнеров, игнорируем ошибку, если сеть уже существует
         run: |
-          docker network create my-network || true  # Сеть уже может существовать
+          docker network create my-network || true
 
       - name: Build Docker image
+        # Сборка Docker-образа для telegram-bot
         run: docker build -t telegram-bot:latest -f ./newsletter-service/tg-bot/Dockerfile ./newsletter-service/tg-bot
 
       - name: Stop and remove existing container
+        # Остановка и удаление предыдущего контейнера telegram-bot
         run: |
           docker stop telegram-bot || true
           docker rm telegram-bot || true
 
       - name: Run Docker container
+        # Запуск контейнера telegram-bot, подключенного к сети my-network
         run: |
           docker run -d \
-            --network my-network \   # Подключаем контейнер к сети
+            --network my-network \
             --name telegram-bot \
             -p 5000:5000 \
             telegram-bot:latest
