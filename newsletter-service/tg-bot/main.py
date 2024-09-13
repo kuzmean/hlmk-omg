@@ -7,12 +7,17 @@ from PIL import Image
 from flask_cors import CORS
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from flask_socketio import SocketIO, emit
+import logging
+
+# Настраиваем логирование
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Телеграм токен и пользовательский ID
 TELEGRAM_TOKEN = '7304368665:AAHaDslyPe06nmsvihiK9AKbrRWIv6FAEDA'
 USER_ID = '301979941'
 
 # Создаем бота и Flask приложение
+logging.info("Создаем экземпляр бота и Flask-приложения")
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 app = Flask(__name__)
 CORS(app)
@@ -22,15 +27,18 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Функция для сохранения изображения
 def save_image(image_data):
+    logging.info("Сохраняем изображение")
     image_data = image_data.split(",")[1]
     image_bytes = base64.b64decode(image_data)
     image = Image.open(BytesIO(image_bytes))
     image_path = "screenshot.png"
     image.save(image_path)
+    logging.info(f"Изображение сохранено в {image_path}")
     return image_path
 
 # Функция для создания кнопок согласования
 def create_rating_buttons():
+    logging.info("Создаем кнопки согласования")
     keyboard = InlineKeyboardMarkup()
     like_button = InlineKeyboardButton("Согласовать", callback_data="like")
     dislike_button = InlineKeyboardButton("Отказать", callback_data="dislike")
@@ -46,6 +54,7 @@ def send_message():
     initial_request = data.get('initialRequest', 'Нет запроса')
 
     try:
+        logging.info(f"Получен запрос на отправку сообщения: {message}")
         formatted_message = (
             f"__Запрос на генерацию:__ {initial_request}\n"
             f"__Комментарий пользователя:__ {message}"
@@ -54,6 +63,7 @@ def send_message():
         if image_data:
             image_path = save_image(image_data)
             with open(image_path, 'rb') as image_file:
+                logging.info("Отправляем фото с сообщением")
                 sent_message = bot.send_photo(
                     USER_ID,
                     image_file,
@@ -62,6 +72,7 @@ def send_message():
                     parse_mode='Markdown'
                 )
         else:
+            logging.info("Отправляем текстовое сообщение")
             sent_message = bot.send_message(
                 USER_ID,
                 formatted_message,
@@ -71,6 +82,7 @@ def send_message():
 
         return jsonify({'success': True, 'message': 'Сообщение отправлено!', 'message_id': sent_message.message_id}), 200
     except Exception as e:
+        logging.error(f"Ошибка при отправке сообщения: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 # Обработчик обратного вызова для кнопок согласования
@@ -80,15 +92,19 @@ def handle_rating_callback(call):
     rating = call.data
     message_id = call.message.message_id 
     result_message = "Данные переданы оператору." if rating == "like" else "Данные переданы оператору."
+    
+    logging.info(f"Получен ответ на согласование: {rating} от пользователя {user_id}")
+    
     bot.send_message(user_id, result_message)
 
     try:
+        logging.info("Отправляем обновление через WebSocket")
         socketio.emit('rating_update', {
             'message_id': message_id,
             'rating': rating,
         })
     except Exception as e:
-        print(f"Ошибка при отправке оценки через WebSocket: {e}")
+        logging.error(f"Ошибка при отправке оценки через WebSocket: {e}")
 
 # Маршрут для обновления рейтинга
 @app.route('/update-rating', methods=['POST'])
@@ -96,6 +112,8 @@ def update_rating():
     data = request.json
     message_id = data.get('message_id')
     rating = data.get('rating')
+
+    logging.info(f"Обновляем рейтинг сообщения {message_id} на {rating}")
 
     socketio.emit('rating_update', {
         'message_id': message_id,
@@ -106,9 +124,11 @@ def update_rating():
 
 # Функция для запуска бота в отдельном потоке
 def start_bot():
+    logging.info("Запуск Telegram-бота")
     bot.polling()
 
 if __name__ == '__main__':
+    logging.info("Запуск приложения")
     bot_thread = threading.Thread(target=start_bot)
     bot_thread.start()
     
