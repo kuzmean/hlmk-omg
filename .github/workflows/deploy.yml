@@ -12,6 +12,7 @@ on:
       - 'Dockerfile'  
       - 'logo.svg'  
       - 'test.png'
+      - '.github/workflows/**'  # Следит за изменениями в директории workflows
       
 jobs:
   build-and-deploy:
