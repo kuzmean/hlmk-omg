@@ -15,14 +15,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Create Docker network
-        # Создаем общую сеть для контейнеров, игнорируем ошибку, если сеть уже существует
-        run: |
-          docker network create my-network || true
-
       - name: Build Docker image
-        # Сборка Docker-образа для Flask-приложения
-        run: docker build -t flask-app:latest -f ./RESTful API/flask-app/Dockerfile ./RESTful API/flask-app
+        # Сборка Docker-образа для Flask-приложения. Обратите внимание на кавычки вокруг путей с пробелами
+        run: docker build -t flask-app:latest -f "./RESTful API/Dockerfile" "./RESTful API"
 
       - name: Stop and remove existing container
         # Остановка и удаление предыдущего контейнера flask-app
@@ -31,7 +26,7 @@ jobs:
           docker rm flask-app || true
 
       - name: Run Docker container
-        # Запуск контейнера flask-app, подключенного к сети my-network
+        # Запуск контейнера flask-app, подключенного к существующей сети my-network
         run: |
           docker run -d \
             --network my-network \
