@@ -5,28 +5,25 @@ on:
     branches:
       - Deploy  # Запускать при пуше в ветку Deploy
     paths:
-      - 'package.json'  # Следит за изменениями в файле package.json
-      - 'package-lock.json'  # Следит за изменениями в файле package-lock.json
-      - 'src/**'  # Следит за изменениями во всей директории src
-      - 'public/**'  # Следит за изменениями во всей директории public
-      - 'Dockerfile'  # Следит за изменениями в Dockerfile
-      - 'logo.svg'  # Следит за изменениями в файле logo.svg
-      - 'test.png'  # Следит за изменениями в файле test.png
+      - 'package.json'  
+      - 'package-lock.json'  
+      - 'src/**'  
+      - 'public/**'  
+      - 'Dockerfile'  
+      - 'logo.svg'  
+      - 'test.png'
       
 jobs:
   build-and-deploy:
     runs-on: self-hosted 
 
     steps:
-      # Шаг 1: Клонируем код репозитория
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Шаг 2: Сборка Docker-образа
       - name: Build Docker image
         run: docker build -t my-node-app:latest .
 
-      # Шаг 3: Остановка и удаление предыдущего контейнера (если существует)
       - name: Stop and remove existing container
         run: |
           if [ $(docker ps -q -f name=my-node-app) ]; then
@@ -34,10 +31,10 @@ jobs:
             docker rm my-node-app
           fi
 
-      # Шаг 4: Запуск нового контейнера
       - name: Run Docker container
         run: |
           docker run -d \
+            --network my-network \  # Подключаем к той же сети
             --name my-node-app \
             -p 3000:3000 \
             my-node-app:latest
