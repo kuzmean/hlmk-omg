@@ -9,8 +9,8 @@ from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from flask_socketio import SocketIO, emit
 
 # Телеграм токен и пользовательский ID
-TELEGRAM_TOKEN = 'your_telegram_token'
-USER_ID = 'your_user_id'
+TELEGRAM_TOKEN = '7304368665:AAHaDslyPe06nmsvihiK9AKbrRWIv6FAEDA'
+USER_ID = '301979941'
 
 # Создаем бота и Flask приложение
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
