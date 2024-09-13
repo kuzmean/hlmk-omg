@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  my-node-app:
+    image: my-node-app:latest
+    ports:
+      - "3000:3000"  # Проброс порта 3000 хоста на 3000 контейнера
+    networks:
+      - my-network
+    restart: unless-stopped
+
+  telegram-bot:
+    image: telegram-bot:latest
+    ports:
+      - "5000:5000"  # Проброс порта 5000 хоста на 5000 контейнера
+    networks:
+      - my-network
+    restart: unless-stopped
+
+networks:
+  my-network:
+    driver: bridge
