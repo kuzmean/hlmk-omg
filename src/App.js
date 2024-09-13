@@ -26,7 +26,7 @@ function App() {
 
   const fetchComponentsFromServer = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/main', {
+      const response = await fetch('http://flask-app:5001/api/main', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -141,7 +141,7 @@ function App() {
     const imageData = canvas.toDataURL('image/png');
     console.log("Отправляем данные на сервер:", { message: comment, initialRequest: sendingData?.description });
 
-    fetch('http://172.18.0.3:5000/send-message', {
+    fetch('http://telegram-bot:5000/send-message', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -206,7 +206,7 @@ function App() {
   };
 
   useEffect(() => {
-    const socket = io('http://172.18.0.3:5000');
+    const socket = io('http://telegram-bot:5000');
 
     socket.on('connect', () => {
       console.log("WebSocket соединение установлено");
