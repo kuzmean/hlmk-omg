@@ -4,7 +4,15 @@ on:
   push:
     branches:
       - Deploy  # Запускать при пуше в ветку Deploy
-
+    paths:
+      - 'package.json'  # Следит за изменениями в файле package.json
+      - 'package-lock.json'  # Следит за изменениями в файле package-lock.json
+      - 'src/**'  # Следит за изменениями во всей директории src
+      - 'public/**'  # Следит за изменениями во всей директории public
+      - 'Dockerfile'  # Следит за изменениями в Dockerfile
+      - 'logo.svg'  # Следит за изменениями в файле logo.svg
+      - 'test.png'  # Следит за изменениями в файле test.png
+      
 jobs:
   build-and-deploy:
     runs-on: self-hosted  # Используем self-hosted runner
