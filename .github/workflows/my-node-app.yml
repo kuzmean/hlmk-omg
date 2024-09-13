@@ -1,39 +1,35 @@
-name: Deploy Application
+name: Deploy Flask App
 
 on:
   push:
     branches:
       - Deploy
     paths:
-      - 'package.json'
-      - 'package-lock.json'
-      - 'src/**'
-      - 'public/**'
-      - 'Dockerfile'
-      - '.github/workflows/deploy.yml'
+      - 'RESTful API/**'  # Следит за изменениями в директории flask-app
+      - '.github/workflows/flask-app.yml'  # Следит за изменениями в директории workflows
 
 jobs:
   build-and-deploy:
     runs-on: self-hosted
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
       - name: Build Docker image
-        run: docker build -t my-node-app:latest .
+        # Сборка Docker-образа для Flask-приложения. Обратите внимание на кавычки вокруг путей с пробелами
+        run: docker build -t flask-app:latest -f "./RESTful API/Dockerfile" "./RESTful API"
 
       - name: Stop and remove existing container
+        # Остановка и удаление предыдущего контейнера flask-app
         run: |
-          if [ $(docker ps -q -f name=my-node-app) ]; then
-            docker stop my-node-app
-            docker rm my-node-app
-          fi
+          docker stop flask-app || true
+          docker rm flask-app || true
 
       - name: Run Docker container
+        # Запуск контейнера flask-app, подключенного к существующей сети my-network
         run: |
           docker run -d \
             --network my-network \
-            --name my-node-app \
-            -p 3000:3000 \
-            my-node-app:latest
+            --name flask-app \
+            -p 5001:5001 \
+            flask-app:latest
