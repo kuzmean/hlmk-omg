@@ -15,7 +15,7 @@ on:
       
 jobs:
   build-and-deploy:
-    runs-on: self-hosted  # Используем self-hosted runner
+    runs-on: self-hosted 
 
     steps:
       # Шаг 1: Клонируем код репозитория
@@ -29,8 +29,10 @@ jobs:
       # Шаг 3: Остановка и удаление предыдущего контейнера (если существует)
       - name: Stop and remove existing container
         run: |
-          docker stop my-node-app || true
-          docker rm my-node-app || true
+          if [ $(docker ps -q -f name=my-node-app) ]; then
+            docker stop my-node-app
+            docker rm my-node-app
+          fi
 
       # Шаг 4: Запуск нового контейнера
       - name: Run Docker container
