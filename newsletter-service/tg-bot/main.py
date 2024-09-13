@@ -127,6 +127,11 @@ def start_bot():
     logging.info("Запуск Telegram-бота")
     bot.polling()
 
+@app.route('/')
+def home():
+    return "Welcome to the Telegram Bot server!"
+
+
 if __name__ == '__main__':
     logging.info("Запуск приложения")
     bot_thread = threading.Thread(target=start_bot)
