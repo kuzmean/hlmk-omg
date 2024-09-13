@@ -6,7 +6,7 @@ on:
       - Deploy
     paths:
       - 'RESTful API/**'  # Следит за изменениями в директории flask-app
-      - '.github/workflows/rest-api.yml'  # Следит за изменениями в директории workflows
+      - '.github/workflows/flask-app.yml'  # Следит за изменениями в директории workflows
 
 jobs:
   build-and-deploy:
