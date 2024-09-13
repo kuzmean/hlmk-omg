@@ -1,0 +1,40 @@
+name: Deploy Flask App
+
+on:
+  push:
+    branches:
+      - Deploy
+    paths:
+      - 'RESTful API/**'  # Следит за изменениями в директории flask-app
+      - '.github/workflows/rest-api.yml'  # Следит за изменениями в директории workflows
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Create Docker network
+        # Создаем общую сеть для контейнеров, игнорируем ошибку, если сеть уже существует
+        run: |
+          docker network create my-network || true
+
+      - name: Build Docker image
+        # Сборка Docker-образа для Flask-приложения
+        run: docker build -t flask-app:latest -f ./RESTful API/flask-app/Dockerfile ./RESTful API/flask-app
+
+      - name: Stop and remove existing container
+        # Остановка и удаление предыдущего контейнера flask-app
+        run: |
+          docker stop flask-app || true
+          docker rm flask-app || true
+
+      - name: Run Docker container
+        # Запуск контейнера flask-app, подключенного к сети my-network
+        run: |
+          docker run -d \
+            --network my-network \
+            --name flask-app \
+            -p 5001:5001 \
+            flask-app:latest
