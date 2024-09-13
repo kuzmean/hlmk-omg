@@ -141,7 +141,7 @@ function App() {
     const imageData = canvas.toDataURL('image/png');
     console.log("Отправляем данные на сервер:", { message: comment, initialRequest: sendingData?.description });
 
-    fetch('http://84.201.144.84:0/send-message', {
+    fetch('http://84.201.144.84:5000/send-message', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
