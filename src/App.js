@@ -101,7 +101,23 @@ function App() {
 
   const relatedElements = useMemo(() => (
     <div ref={relatedElementsRef}>
-      {components.length > 0 ? components : 'some text info'}
+      <Avatar userName="Иван" userSurname="Иванов" />
+      <br />
+      <File label="Прикрепите файл" />
+      <br />
+      <Select
+        options={[
+          { value: 'male', label: 'Мужской' },
+          { value: 'female', label: 'Женский' }
+        ]}
+        label="Пол"
+        selected={[]}
+        onSelectionChange={() => { }}
+      />
+      <br />
+      <Button style={{ backgroundColor: 'blue', color: 'white' }}>
+        Сдать ответ
+      </Button>
     </div>
   ), [components]);
 
