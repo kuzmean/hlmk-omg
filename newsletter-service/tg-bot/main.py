@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 # Телеграм токен и пользовательский ID
 TELEGRAM_TOKEN = '7304368665:AAHaDslyPe06nmsvihiK9AKbrRWIv6FAEDA'
-USER_ID = '301979941'
+USER_ID = '212130127'
 
 # Создаем бота и Flask приложение
 logging.info("Создаем экземпляр бота и Flask-приложения")
