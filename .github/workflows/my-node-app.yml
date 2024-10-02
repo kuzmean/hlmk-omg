@@ -33,7 +33,7 @@ jobs:
         run: |
           docker run -d \
             --network my-network \
-            --name my-node-app \
+            --name my-node-app2 \
             -p 3000:3000 \
             my-node-app2:latest
 
